@@ -17,7 +17,6 @@
   @return nth(Devices\models($self), $index);
 }
 
-//todo 19line
 @function Devices\find($self, $key, $value) {
   $result: ();
   @each $device in Devices\models($self) {
@@ -26,5 +25,12 @@
     }
   };
   @return nth($result, 1);
-}
+} 
 
+@function Devices\findByName($self, $value) {
+  @each $device in Devices\models($self) {
+    @if Device\name($device) == $value {
+      @return $device;
+    }
+  }; 
+}

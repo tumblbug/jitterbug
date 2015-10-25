@@ -39,7 +39,6 @@ $JB\defaultsConfigurations);
     ))
   )); 
   $_devices: append($_devices, $_default_device); 
-  @debug $_devices;
   @each $min-width, $properties in map-get($JB\defaults, breakpoints)  {
     $_devices: append($_devices, Device\new((
       name: map-get($properties, name),
@@ -51,7 +50,6 @@ $JB\defaultsConfigurations);
       ))
     )));
   } 
-  @debug $_devices;
   @return $_devices; 
 }
 
@@ -63,8 +61,6 @@ $_grid: Grid\new(
   )
 ); 
 
-$JB\devices: Devices\new(
-  (
+$JB\devices: Devices\new((
     models: JB\parseBreakpoints()
-  )
-); 
+)) !global; 

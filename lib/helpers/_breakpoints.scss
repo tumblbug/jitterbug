@@ -1,9 +1,17 @@
-@mixin JB\respondTo($device) {
+@mixin JB\respondTo($name) {
+  $device: Devices\findByName($JB\devices, $name);
+  @media screen and (min-width: Device\minWidth($device)) {
+    @content;
+  }
+}
+
+@mixin JB\respTo($device) {
   $min-width: Device\minWidth($device);
   @media screen and (min-width: $min-width) {
     @content;
   }
 }
+
 
 //++--
 // Generate 'JB\respondTo' declaration block by index 
@@ -18,7 +26,7 @@
     // Default device:
     @content
   } @else { 
-    @include JB\respondTo(Devices\get($JB\devices, $index)) {
+    @include JB\respTo(Devices\get($JB\devices, $index)) {
       @content
     } 
   } 
