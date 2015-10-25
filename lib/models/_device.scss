@@ -1,0 +1,29 @@
+@function Device\new($arg) {
+  @return (
+    name: map-get($arg, name) or "default-screen",
+    min-width: map-get($arg, min-width) or 0,
+    typography: map-get($arg, typography)
+  ); 
+} 
+
+@function Device\name($self) {
+  @return map-get($self, name);
+} 
+
+@function Device\minWidth($self) {
+  @return map-get($self, min-width);
+} 
+
+@function Device\baseFontSize($self) {
+  @return Typography\baseFontSize(map-get($self, typography));
+} 
+
+@function Device\baseline($self) {
+  @return Typography\baseline(map-get($self, typography));
+} 
+
+@function Device\scaleFactor($self) {
+  @return Typography\scaleFactor(map-get($self, typography));
+} 
+
+

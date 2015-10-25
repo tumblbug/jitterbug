@@ -1,0 +1,117 @@
+//++--
+//
+// Grid Model
+//
+//
+// --Author: Yum Jaeseung 
+// --Terminology:  
+//
+//  Given there are 4 columns,
+//
+//    |------------------------------- Outer width ----------------------------|
+//     |--------------------------------- Width ------------------------------| 
+//
+//    ||                |||               |||               |||               ||  }-- a Row (!= baseline)
+//    ||                |||               |||               |||               ||  
+//    ||                |||               |||               |||               ||
+//    ||                |||               |||               |||               ||  
+//    ||                |||               |||               |||               ||  
+//
+//     |--- a Module ---|                  ^                                  ^
+//    |---- a Column ----|              a Gutter                          Gutter(1/2) 
+//
+//
+//    wowRatio   = width : outerWidth 
+//    gcRatio    = 1 gutter : 1 column 
+//    mcRatio    = 1 module : 1 column 
+//    cwRatio    = 1 column : with
+//    cowRatio   = 1 column : outer with
+//    ghwRatio   = 1/2 gutter : with
+//    ghowRatio  = 1/2 gutter : outer with
+//
+// ----------------------------------------------------
+
+
+//++--
+//
+// Grid constructor
+// 
+// --params {Map} argument map
+// --return {Map} a grid map
+//
+//--++
+
+@function Grid\new($arg) {
+  @return (
+    columns:      map-get($arg, columns),
+    module-width: map-get($arg, module-width),
+    gutter-width: map-get($arg, gutter-width)
+  ); 
+}
+
+//===============================================================
+//
+//                       Public Methods
+// 
+//===============================================================
+
+@function Grid\gutterWidth($self) {
+  @return map-get($self, gutter-width);
+} 
+
+
+
+@function Grid\width($self) {
+  @return (Grid\outerWidth($self)) - Grid\gutterWidth($self);
+} 
+
+@function Grid\outerWidth($self) {
+  @return Grid\_columnWidth($self) * Grid\_columns($self);
+} 
+
+@function Grid\gutterHalfWidth($self) {
+  @return Grid\gutterWidth($self)/2
+}
+
+@function Grid\wowRatio($self) {
+  @return (Grid\width($self)) / Grid\outerWidth($self);
+} 
+
+@function Grid\mcRatio($self) {
+  @return Grid\_moduleWidth($self) / Grid\_columnWidth($self);
+} 
+
+@function Grid\gcRatio($self) {
+  @return Grid\gutterWidth($self) / Grid\_columnWidth($self);
+} 
+
+@function Grid\cowRatio($self) {
+  @return Grid\_columnWidth($self) / Grid\outerWidth($self);
+}
+
+@function Grid\cwRatio($self) {
+  @return Grid\_columnWidth($self) / Grid\width($self);
+} 
+
+@function Grid\ghowRatio($self) {
+  @return Grid\gutterHalfWidth($self)/Grid\outerWidth($self);
+} 
+
+
+//===============================================================
+//
+//                          Private
+// 
+//===============================================================
+
+@function Grid\_moduleWidth($self) {
+  @return map-get($self, module-width);
+} 
+
+@function Grid\_columns($self) {
+  @return map-get($self, columns);
+}
+
+@function Grid\_columnWidth($self) {
+  @return Grid\_moduleWidth($self) + Grid\gutterWidth($self);  
+} 

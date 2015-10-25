@@ -1,0 +1,81 @@
+//---------------------------------------------------//
+//                      Mixins                       //
+//---------------------------------------------------// 
+
+@mixin JB\setType($options:(), $steps...) {
+  $options: JB\defaults((
+    base-font-size: 18px,
+    scale-factor: 1.125,
+  ), $options); 
+
+  @include JB\set(font-size, JB\inEveryBreakpoint($steps, JB\convertStepToFontSize, $options)...);
+  @include JB\set(line-height, JB\inEveryBreakpoint($steps, JB\convertStepToLineHeight, $options)...);
+} 
+
+@function JB\convertStepToFontSize($step, $options:()) { 
+  $options: JB\defaults((
+    base-font-size: 0,
+    scale-factor: 1.125,
+  ), $options);
+
+  $base-font-size: map-get($options, base-font-size);
+  $scale-factor: map-get($options, scale-factor);
+  @return round(JB\computeFontSize($step, $base-font-size, $scale-factor)); 
+};
+
+
+@function JB\convertStepToLineHeight($step, $options:()) {
+  $options: JB\defaults((
+    base-font-size: 0,
+    scale-factor: 1.125,
+  ), $options);
+
+  /*@warn map-get($options, index);*/
+  $base-font-size: map-get($options, base-font-size);
+  $scale-factor: map-get($options, scale-factor);
+  $baseline: Device\baseline(Devices\get($JB\devices, map-get($options, index)));
+  $computed-font-size: round(JB\computeFontSize($step, $base-font-size, $scale-factor));
+  $lines: ceil($computed-font-size / $baseline);
+
+  @return $baseline * $lines; 
+};
+
+@function JB\computeFontSize($step, $base-font-size, $scale-factor) {
+  @return JB\pow($scale-factor, $step) * $base-font-size; 
+}; 
+
+@mixin JB\fontSmoothing($value: true) {
+  @if $value {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: geometricPrecision;
+  } @else {
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+  }
+} 
+
+@mixin hyphens($value: auto) {
+  -webkit-hyphens: $value;
+  -moz-hyphens: $value;
+  -ms-hyphens: $value;
+  hyphens: $value;
+}
+
+@mixin line($arg:()) {
+
+  $distance:  map-get($arg, distance);
+  $color:     map-get($arg, color) or rgb(220, 220, 220);
+  $thickness: map-get($arg, thickness) or 1px;
+
+  position: relative;
+
+  &:after {
+    content: "";
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: $distance * -1; 
+    border-bottom: $thickness solid $color;
+  }
+} 

@@ -1,0 +1,36 @@
+//---------------------------------------------------
+// [Class: Typography]
+//
+//
+// Author: Yum Jaeseung 
+//
+// ----------------------------------------------------
+
+@function Typography\new($arg) {
+  @return (
+    baseline:       map-get($arg, baseline),
+    base-font-size: map-get($arg, base-font-size),
+    scale-factor:   map-get($arg, scale-factor)
+  )
+} 
+
+
+// -------- Getter ---------- //
+
+@function Typography\baseline($self) {
+  @return map-get($self, baseline);
+}
+
+@function Typography\baseFontSize($self) {
+  @return map-get($self, base-font-size);
+}
+
+@function Typography\scaleFactor($self) {
+  @return map-get($self, scale-factor);
+}
+
+// -------- Methods ---------- //
+
+@function Typography\baselineRatio($self, $font-size: Typography\baseFontSize($self)) {
+  @return Typography\baseline($self) / $font-size;
+}

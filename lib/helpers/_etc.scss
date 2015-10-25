@@ -1,0 +1,84 @@
+/// Map deep get
+///// @author Hugo Giraudel
+///// @access public
+//@param {Map} $map - Map
+//@param {Arglist} $keys - Key chain
+//@return {*} - Desired value
+@function map-deep-get($map, $keys...) {
+  @each $key in $keys {
+    $map: map-get($map, $key);
+  }
+  @return $map;
+}
+
+@function Math\exponent($base, $exponent) {
+	@if pow(2, 2) == 4 {
+		@return pow($base, $exponent);
+	}
+	$value: $base;
+	@if $exponent > 1 {
+		@for $i from 2 through $exponent {
+			$value: $value * $base; } }
+	@if $exponent < 1 {
+		@for $i from 0 through -$exponent {
+			$value: $value / $base; } }
+	@return $value;
+}
+
+//---------------------------------------------------//
+//                     Functions                     //
+//---------------------------------------------------//
+
+// Add percentage of white to a color 
+@function tint($color, $percent) {
+  @return mix(rgb(255, 255, 255), $color, $percent);
+}
+
+// Add percentage of black to a color
+@function shade($color, $percent) {
+  @return mix(rgb(0, 0, 0), $color, $percent);
+} 
+
+@mixin opacity($density) {
+  $density_for_IE: $density*100;
+  opacity: $density;
+  -moz-opacity: $density;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=" + #{$density_for_IE} + ")";
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=#{$density_for_IE});
+}
+
+@mixin rotate ($deg) {
+  transform: rotate($deg);
+  -moz-transform: rotate($deg);
+  -webkit-transform: rotate($deg);
+  -o-transform: rotate($deg);
+  -ms-transform: rotate($deg);
+}
+
+@function JB\isColor($object) {
+  @return type-of($object) == "color"
+}
+
+@function JB\isString($object) {
+  @return type-of($object) == "string"
+}
+
+@function JB\isNull($object) {
+  @return type-of($object) == "null"
+}
+
+@mixin JB\transform($transforms) {
+  -moz-transform: $transforms;
+  -o-transform: $transforms;
+  -ms-transform: $transforms;
+  -webkit-transform: $transforms;
+  transform: $transforms;
+}
+
+@mixin JB\transformOrigin ($origin) {
+  moz-transform-origin: $origin;
+  -o-transform-origin: $origin;
+  -ms-transform-origin: $origin;
+  -webkit-transform-origin: $origin;
+  transform-origin: $origin;
+}

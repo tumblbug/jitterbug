@@ -1,0 +1,79 @@
+@mixin JB\UI\media($options:()) {
+
+  $options: JB\defaults(( 
+    
+    elements: (
+      item: (
+        name: "item"
+      ),
+      body: (
+        name: "body"
+      ) 
+    ),
+
+    modifiers: (
+      horiz: (
+        name: "horiz",
+        values: (
+          yes: (
+            name: "yes"
+          )
+        )
+      ),
+
+      valign: (
+        name: "valign",
+        values: (
+          top: (
+            name: "top"
+          ),
+          bottom: (
+            name: "bottom" 
+          ) 
+        )
+      )
+    ) 
+
+  ), $options); 
+
+  @include MOD(map-deep-get($options, modifiers, "horiz", name)) {
+
+    display: table;
+
+    > *:first-child {
+      @include JB\setGutter((type: "padding"), (0 .5 0 0));
+    }
+
+    @include ALL(
+      ELEM(map-deep-get($options, elements, "item", name)),
+      ELEM(map-deep-get($options, elements, "body", name))
+    ) {
+      display: table-cell;
+      vertical-align: middle;
+    }
+  }
+
+  @include MOD(map-deep-get($options, modifiers, "valign", name), 
+               map-deep-get($options, modifiers, "valign", values, "top", name)){
+
+    @include ALL(
+      ELEM(map-deep-get($options, elements, "item", name)),
+      ELEM(map-deep-get($options, elements, "body", name))
+    ) {
+      vertical-align: top;
+    } 
+  }
+
+  @include MOD(map-deep-get($options, modifiers, "valign", name), 
+               map-deep-get($options, modifiers, "valign", values, "bottom", name)){
+
+    @include ALL(
+      ELEM(map-deep-get($options, elements, "item", name)),
+      ELEM(map-deep-get($options, elements, "body", name))
+    ) {
+      vertical-align: bottom;
+    } 
+  }
+
+} 
+

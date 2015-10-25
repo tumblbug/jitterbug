@@ -1,0 +1,30 @@
+@function Devices\new($arg) {
+  @return (
+    default: nth(map-get($arg, models), 1),
+    models: map-get($arg, models)
+  ); 
+} 
+
+@function Devices\models($self) {
+  @return map-get($self, models);
+}
+
+@function Devices\default($self) {
+  @return map-get($self, default);
+}
+
+@function Devices\get($self, $index) {
+  @return nth(Devices\models($self), $index);
+}
+
+//todo 19line
+@function Devices\find($self, $key, $value) {
+  $result: ();
+  @each $device in Devices\models($self) {
+    @if Device\name($device) == $value {
+      $result: append($result, $device);
+    }
+  };
+  @return nth($result, 1);
+}
+

@@ -1,0 +1,70 @@
+// The defaults configurations of The library
+
+$JB\defaultsConfigurations: (
+
+  columns: 12,
+  module-width: 70px,
+  gutter-width: 30px,
+
+  baseline: 27px,
+  base-font-size: 15px,
+  scale-factor: 1.414,
+
+  breakpoints: (
+    767px: (name: "tablet-screen", baseline: 32px, base-font-size: 16px, scale-factor: 1.414),
+    996px: (name: "medium-screen", baseline: 32px, base-font-size: 18px, scale-factor: 1.414),
+    1200px: (name: "wide-screen", baseline: 32px, base-font-size: 18px, scale-factor: 1.414)
+  )
+);
+
+
+// Merge given custom options($jitterbug) into the defaults configurations
+
+$JB\defaults: if(variable-exists(jitterbug), 
+map-merge($JB\defaultsConfigurations, $jitterbug), 
+$JB\defaultsConfigurations);
+
+
+// Parse given breakpoint list,
+// then convert it into Jitterbug's devices list
+// @return {Devices}
+
+@function JB\parseBreakpoints() {
+  $_devices: ();
+  $_default_device: Device\new((
+    typography: Typography\new((
+      baseline: map-get($JB\defaults, baseline),
+      base-font-size: map-get($JB\defaults, base-font-size),
+      scale-factor: map-get($JB\defaults, scale-factor)
+    ))
+  )); 
+  $_devices: append($_devices, $_default_device); 
+  @debug $_devices;
+  @each $min-width, $properties in map-get($JB\defaults, breakpoints)  {
+    $_devices: append($_devices, Device\new((
+      name: map-get($properties, name),
+      min-width: $min-width,
+      typography: Typography\new((
+        baseline: map-get($properties, baseline),
+        base-font-size: map-get($properties, base-font-size),
+        scale-factor: map-get($properties, scale-factor)
+      ))
+    )));
+  } 
+  @debug $_devices;
+  @return $_devices; 
+}
+
+$_grid: Grid\new(
+  (
+    columns: map-get($JB\defaults, columns), 
+    module-width: map-get($JB\defaults, module-width), 
+    gutter-width: map-get($JB\defaults, gutter-width)
+  )
+); 
+
+$JB\devices: Devices\new(
+  (
+    models: JB\parseBreakpoints()
+  )
+); 

@@ -1,0 +1,517 @@
+
+//++--
+//
+// Set key value in each breakpoint
+//
+// @param {String} key - css key to set value
+// @param {ArgList} values - a list of value
+// @author Yum 
+// @example:
+//    @include JB\set(margin, 1px, 2px, 3px);
+//      => margin: 1px in device 1,
+//         margin: 2px in device 2,
+//         margin: 3px in device 3, device 4, ...
+//
+
+@mixin JB\set($key, $values...) { 
+
+  @for $i from 1 through length($values) { 
+
+    @include JB\mediaQueryTrickler($i) { 
+      #{$key}: nth($values, $i); 
+    }
+  }
+
+  @content;
+} 
+
+
+//++--
+//
+// Set module height by device's baseline
+//
+// @param {List} options - the options to set module height with.
+// @option options {String} :offset - a value to remove in total module height.
+// @option options {String} :mq-fallback - height in no media query support context.
+// @param {ArgList} heights in each device - a list of (ratios | number-width-unit(e.g 1px, 2em..))
+// @author Yum
+// @example:
+//
+//   @include JB\setBaseline((), 1, 4, 9);
+//     => 1 baseline in device 1,
+//        4 baseline in device 2,
+//        9 baseline in device 9
+//
+//   @include JB\setBaseline((offset: 1), 1);
+//     => (1 baseline - 1px) in every device
+//
+//--++ 
+
+@mixin JB\setBaseline($options, $heights...) {
+
+  $options: JB\defaults((
+
+    offset: 0, 
+    mq-fallback: if(length($heights) > 0, nth($heights, length($heights)), auto) // for no media query support
+
+  ), $options); 
+
+  @include JB\set(height, 
+                  JB\inEveryBreakpoint($heights, JB\convertHeightToCssValue, (offset: map-get($options, offset)))...);
+
+  @include fallback("lt-ie9") {
+    height: JB\convertHeightToCssValue(map-get($options, mq-fallback), (index: length($heights)))
+  }
+} 
+
+
+//++--
+//
+// Make a responsive container
+//
+// @param {List} options - the options to create a container with.
+// @option options {String} :mq-fallback - width in no media query support context
+// @param {ArgList} values - a list of container width in each breakpoint 
+// @author Yum
+// @example:
+//
+//    @include JB\setContainer((), 100%, 80%, 65%, 1200px); 
+//
+//    => container width 100% in device 1, 
+//                        80% in device 2, 
+//                        65% in device 3, 
+//                     1200px in device 4, device 5, ...
+//
+//--++
+
+@mixin JB\setContainer($options:(), $container-sizes...) { 
+
+  $options: JB\defaults(( 
+    mq-fallback: nth($container-sizes, length($container-sizes)) 
+  ), $options); 
+
+  @include JB\set(width, $container-sizes...) {
+    margin: 0 auto; 
+  }; 
+
+  @include fallback("lt-ie9") {
+    width: map-get($options, mq-fallback); 
+  }
+} 
+
+
+//++--
+//
+// Set a column
+//
+// @param {List} options - the options to create a column with.
+// @option options {String} :size - auto / manual
+// @option options {String} :mq-fallback - width in no media query support context
+// @param {ArgList} widths - a list of (ratios | number-width-unit(e.g 1px, 2em..) | "auto")
+// @author Yum 
+// @example:
+//
+//    @include JB\setColumn((), 1, 1/2, 1/4);
+//    => 100% width in device 1,
+//        50% width in device 2,
+//        25% width in device 3, ...
+//
+//    @include JB\setColumn((), 1, 1/2);
+//    => 100% width in device 1, 
+//        50% width in device 2, device 3, ...
+//
+//    @include JB\setColumn((), 1);
+//    => 100% width in every device;
+//
+//    @include JB\setColumn((), 1, auto);
+//    => 100% width in device 1,
+//       auto width in device 2, device 3, ...
+//
+//    @include JB\setColumn((), 1, 100px);
+//    => 100% width in device 1,
+//       100px width in device 2, device 3, ...
+//
+//--++ 
+
+@mixin JB\setColumn($options:(), $widths...) {
+
+  $options: JB\defaults(( 
+    mq-fallback: JB\convertWidthToCssValue(nth($widths, length($widths)))
+  ), $options); 
+
+  box-sizing: border-box;
+  @include JB\set(width,        JB\collect($widths, JB\convertWidthToCssValue)...);
+  @include JB\set(flex,         JB\collect($widths, JB\convertWidthToFlexValue)...); 
+  @include JB\set(-ms-flex,     JB\collect($widths, JB\convertWidthToFlexValue)...); 
+  @include JB\set(-webkit-flex, JB\collect($widths, JB\convertWidthToFlexValue)...); 
+
+  @include fallback("lt-ie10") {
+    @if map-get($options, mq-fallback) == "auto" {
+      display: table-cell; 
+      float: none;
+      width: auto;
+    } @else {
+      display: inline;
+      float: left;
+      zoom: 1; 
+    }
+  }
+
+  @include fallback("lt-ie9") {
+    @if map-get($options, mq-fallback) != "auto" { 
+      width: map-get($options, mq-fallback);
+    }
+  }
+} 
+
+
+//++--
+//
+// Make a row
+//
+// @param {List} options - the options to create a row with.
+// @option options {Boolean} :open-ended - for dynamically adding column
+// @author Yum
+// @example:
+//
+//    @include JB\setRow;
+//     => genereates a grid row(basic column container);
+//
+//    @include JB\setRow((open-ended: true));
+//     => genereates a grid row(auto-sizing column container);
+//
+//--++
+
+@mixin JB\setRow($options:()) {
+
+  $options: JB\defaults(( 
+    open-ended: false 
+  ), $options);
+
+  @include flexbox;
+  @include flex-flow(row wrap);
+  @include align-content(flex-start);
+
+  @if map-get($options, open-ended) {
+    @include fallback("lt-ie10") {
+      display: table;
+      width: 100%;
+    }
+  } 
+
+  @include fallback("lt-ie10") {
+    overflow: hidden;
+
+    &:after {
+      display: table;
+      content: "";
+      clear: both;
+    }
+  }
+} 
+
+
+//++--
+//
+// Convert width value to valid css value;
+//
+// If $width is unitless number, convert it to percent value.
+// otherwise, returns as-is
+//
+//--++
+
+@function JB\convertWidthToCssValue($width) {
+  @if JB\isRatio($width) { @return percentage($width); } 
+  @return $width;
+} 
+
+
+//++--
+//
+// Convert width value to proper flex value;
+//
+// If width $value equals "auto" returns 1
+// otherwise, returns (0 1 auto)
+//
+//--++
+
+@function JB\convertWidthToFlexValue($width) {
+  @if $width == "auto" { @return 1; } 
+  @return (0 1 auto);
+} 
+
+
+
+//++--
+//
+// Test if the value is ratio or not;
+//
+//--++
+
+@function JB\isRatio($value) {
+  @if type-of($value) == "number" and unitless($value) { @return true; } 
+  @return false;
+}
+
+
+
+//++--
+//
+// Set gutters
+//
+// @param {List} options - the options to create a gutter with.
+// @option options {String} :mq-fallback - margins in no media query support context
+// @param {ArgList} gutters of each device
+// @author Yum
+// @example:
+//
+//    @include JB\setGutter((), (1 0 2));
+//     => "margin: baseline x 1  gutterWidth x 0  baseline x 2" in every device
+//
+//    @include JB\setGutter(
+//      (type: "padding"), 
+//      (1 0 2), 
+//      (1 2 3 4)
+//    );
+//     => padding: baseline x 1  gutterWidth x 0  baseline x 2 in device 1,
+//        padding: baseline x 1  gutterWidth x 2  baseline x 3 gutterWidth x 4 in device 2, device 3, ...
+//
+// @todo: force-unit: baseline / gutter-width
+//
+//--++
+
+@mixin JB\setGutter($options:(), $gutters...) { 
+
+  $options: JB\defaults((
+
+    type: "margin",
+    mq-fallback: if(
+                    length($gutters) > 0, 
+                    nth($gutters, length($gutters)), // the last one as media query fallback
+                    auto
+                    ) 
+
+  ), $options);
+
+  @include JB\set(map-get($options, type), 
+                  JB\inEveryBreakpoint($gutters, JB\convertGuttersToCssValue)...);
+
+  @include fallback("lt-ie9") {
+    margin: JB\convertGutters(map-get($options, mq-fallback), 1);
+  }
+} 
+
+
+// @param {ArgList}
+// @param {Function} - a function to apply
+// @return {List}
+
+@function JB\inEveryBreakpoint($list, $function, $options:()) {
+  @return join(JB\inEachBreakpoint($list, $function, $options), 
+               JB\inRestBreakpoints($list, $function, $options));
+}
+
+
+// @param {ArgList}
+// @param {Function} - a function to apply
+// @return {List}
+
+@function JB\inEachBreakpoint($list, $function, $options) {
+  $result: ();
+  @each $index, $list-item in JB\listToMap($list) {
+    $options-deep: JB\defaults((
+      index: $index
+    ), $options);
+    $result: append($result, call($function, $list-item, $options-deep));
+  }
+  @return $result;
+}
+
+
+// @params {List}
+// @returns {List}
+// @example:
+//
+//  JB\inRestBreakpoints(1,2, JB\convertHeightToCssValue)
+//  => (64px, 64px);
+
+@function JB\inRestBreakpoints($list, $function, $options) {
+  $last: nth($list, length($list));
+  $result:();
+  @for $index from length($list) to 4 {
+    $options-deep: JB\defaults((
+      index: $index + 1
+    ), $options);
+    $result: append($result, call($function, $last, $options-deep));
+  }
+  @return $result;
+}
+
+
+//++--
+//
+// Convert gutters to valid css value
+// list: gutter values, device-index -> list: gutter values
+//
+// convertGuttersToCssValue(1, 1);
+// => (1*device-baseline 1*gutter)
+//
+// convertGuttersToCssValue((2 1), 2);
+// => (2*device-baseline 1*gutter)
+//
+// convertGuttersToCssValue((1 3 1 1), 3);
+// => (1*device-baseline 3*gutter 1*gutter 1*gutter)
+//
+// convertGuttersToCssValue((1 3 1), 4);
+// => (1*device-baseline 3*gutter 1*device-baseline)
+//
+//--++
+
+@function JB\convertGuttersToCssValue($value, $options:()) {
+  $options: JB\defaults(( 
+    index: 1
+  ), $options); 
+
+  $bl: Device\baseline(Devices\get($JB\devices, map-get($options, index)));
+  $gt: Grid\gutterWidth($_grid);
+
+  @if length($value) == 1 {
+    @return ( 
+      JB\convertGutterToCssValue($value, $bl) 
+      JB\convertGutterToCssValue($value, $gt) 
+    );
+  } @else if length($value) == 2 {
+    @return (
+      JB\convertGutterToCssValue(nth($value, 1), $bl) 
+      JB\convertGutterToCssValue(nth($value, 2), $gt)
+    );
+  } @else if length($value) == 3 {
+    @return (
+      JB\convertGutterToCssValue(nth($value, 1), $bl) 
+      JB\convertGutterToCssValue(nth($value, 2), $gt) 
+      JB\convertGutterToCssValue(nth($value, 3), $bl)
+    );
+  } @else if length($value) == 4 {
+    @return (
+      JB\convertGutterToCssValue(nth($value, 1), $bl) 
+      JB\convertGutterToCssValue(nth($value, 2), $gt) 
+      JB\convertGutterToCssValue(nth($value, 3), $bl) 
+      JB\convertGutterToCssValue(nth($value, 4), $gt)
+    );
+  }
+} 
+
+@function JB\convertGutterToCssValue($value, $n) {
+  @if JB\isRatio($value) { @return $value* $n; } 
+  @return $value;
+}
+
+@function JB\convertHeightToCssValue($height, $options:()) {
+  $options: JB\defaults(( 
+    index: 1,
+    offset: 0
+  ), $options); 
+
+  $bl: Device\baseline(Devices\get($JB\devices, map-get($options, index)));
+
+  @if JB\isRatio($height) { @return ($height * $bl - map-get($options, offset)) } 
+  @return $height - map-get($options, offset);
+} 
+
+
+//===============================================================
+//
+//                          Private
+// 
+//=============================================================== 
+
+@function JB\defaults($defaults, $options) {
+  @return map-merge($defaults, $options);
+}
+
+@mixin fallback($browsers) {
+  .#{$browsers} & {
+    @content
+  }
+} 
+
+
+@function JB\range($n) {
+  @if type-of($n) != "number" {
+    @warn "`#{inspect($n)}` is not a number for `JB\range`.";
+    @return null;
+  }
+
+  @if not unitless($n) {
+    @warn "`#{$n}` is not unitless for `JB\range`.";
+    @return null;
+  }
+
+  @if $n < 1 {
+    @warn "`#{$n}` is not greater than 0 for `JB\range`.";
+    @return null;
+  }
+
+  @if $n == 1 { 
+    @return $n;
+  }
+
+  $range: ();
+
+  @for $i from 1 through $n {
+    $range: append($range, $i);
+  }
+
+  @return $range;
+} 
+
+@function JB\missingDependencies($functions...) {
+  $missing-dependencies: ();
+  
+  @each $function in $functions {
+    @if not function-exists($function) {
+      $missing-dependencies: append($missing-dependencies, $function, comma);
+    }
+  }
+  
+  @if length($missing-dependencies) > 0 {
+    @warn "Unmet dependencies! The following functions are required: #{$missing-dependencies}.";
+  }
+  
+  @return length($missing-dependencies) != 0;
+}
+
+@function JB\isEmpty($list) {
+  @return length($list) == 0;
+}
+
+@function JB\listToMap($list) {
+  @if JB\missingDependencies(JB\range, JB\isEmpty) == true { @return null; }
+
+  @if JB\isEmpty($list) {
+    @warn "List cannot be empty for `JB\listToMap`.";
+    @return null;
+  }
+
+  @return zip(JB\range(length($list)), $list);
+} 
+
+@function JB\toList($value, $separator: list-separator($value)) {
+  @return join((), $value, $separator);
+}
+
+@function JB\collect($list, $function, $args...) {
+  @if JB\missingDependencies(JB\listToMap) == true { @return null; }
+
+  @if not function-exists($function) {
+    @warn "There is no `#{$function}` function for `JB\collect`.";
+    @return null;
+  }
+
+  @each $index, $value in JB\listToMap($list) {
+    $list: set-nth($list, $index, call($function, $value, $args...));
+  }
+
+  @return JB\toList($list);
+  /*@return($list);*/
+}

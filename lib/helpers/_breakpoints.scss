@@ -1,0 +1,25 @@
+@mixin JB\respondTo($device) {
+  $min-width: Device\minWidth($device);
+  @media screen and (min-width: $min-width) {
+    @content;
+  }
+}
+
+//++--
+// Generate 'JB\respondTo' declaration block by index 
+//
+// --params {Number} index
+//
+//--++ 
+
+@mixin JB\mediaQueryTrickler($index) { 
+
+  @if ($index == 1) {
+    // Default device:
+    @content
+  } @else { 
+    @include JB\respondTo(Devices\get($JB\devices, $index)) {
+      @content
+    } 
+  } 
+} 

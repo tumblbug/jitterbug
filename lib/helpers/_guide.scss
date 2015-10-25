@@ -1,0 +1,66 @@
+//--------------------------------------
+// Guideline Toggle (for design process)
+//--------------------------------------
+
+@mixin JB\showColumns($options:()) { 
+
+  $options: JB\defaults((
+
+    color: rgba(90, 160, 160, .1),
+    fill: false,
+    opacity: .88
+
+  ), $options); 
+
+  html {
+    overflow-x: hidden;
+
+    &:before {
+      background: {
+        image: linear-gradient(90deg, map-get($options, color) percentage(Grid\mcRatio($_grid)), transparent percentage(Grid\gcRatio($_grid))); 
+        position: 0 -1px;
+      }
+      content: "";
+      font-size: 100%;
+      height: 100%;
+      left: 0;
+      margin: 0 auto;
+      pointer-events: none;
+      position: fixed;
+      right: 0;
+
+      @if map-get($options, fill) {
+        background-size: percentage(Grid\cowRatio($_grid)) 100%;
+        left: percentage(Grid\ghowRatio($_grid));
+        width: 100%;
+      } @else {
+        background-size: percentage(Grid\cwRatio($_grid)) 100%; 
+        max-width: Grid\width($_grid);
+        width: 95%;
+      }
+    }
+
+    > * { opacity: map-get($options, opacity) }
+  }
+
+}
+
+
+@mixin JB\showBaseline($arg:(color: rgba(101, 203, 255, .25))) {
+
+  $baseline-color: map-get($arg, color); 
+
+  html {
+    background: {
+      image: linear-gradient($baseline-color 1px, transparent 1px); 
+      position: 0 0;
+    }
+
+    @for $index from 1 to length(Devices\models($JB\devices)) + 1 {
+      @include JB\mediaQueryTrickler($index) {
+        $size: Device\baseline(Devices\get($JB\devices, $index));
+        background-size: $size $size;
+      }
+    }
+  } 
+} 

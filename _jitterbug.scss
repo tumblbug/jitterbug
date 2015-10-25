@@ -1,0 +1,30 @@
+// Add this scss file to your project with @import
+// e.g @import 'jitterbug/jitterbug' 
+
+@import "BEM-scss/bem";
+
+// Models
+@import "lib/models/typography";
+@import "lib/models/device"; 
+@import "lib/models/grid"; 
+
+@import "lib/collections/devices"; 
+
+// Settings: Initialize model instances 
+@import "lib/settings"; 
+
+// Helpers
+@import "lib/helpers/math"; 
+@import "lib/helpers/breakpoints";
+@import "lib/helpers/etc"; 
+
+@import "lib/helpers/typography";
+@import "lib/helpers/primitives";
+@import "lib/helpers/tables";
+@import "lib/helpers/grid"; 
+@import "lib/helpers/media";
+@import "lib/helpers/menus";
+
+@import "lib/helpers/guide";
+@import "vendor/flexbox";
+

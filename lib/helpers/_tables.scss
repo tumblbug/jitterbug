@@ -1,0 +1,131 @@
+// [Table]
+//
+// Author: Yum Jaeseung
+// Reference: https://css-tricks.com/responsive-data-tables/
+
+@mixin JB\setTable {
+  display: block;
+
+  thead, 
+  tbody, 
+  tr,
+  th, 
+  td {
+    display: block;
+  } 
+
+  thead tr {
+    left: -9999999px;
+    position: absolute;
+    top: -999999px;
+  }
+
+  tr {
+    border: 1px solid #ddd;
+    border-radius: 3px;
+
+    + tr {
+      margin-top: Device\baseline(Devices\default($JB\devices));
+    }
+  }
+
+  td {
+    // Behave like a "row"
+    border: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: Device\baseline(Devices\default($JB\devices))/4;
+    padding-left: 35%;
+    padding-top: Device\baseline(Devices\default($JB\devices))/4;
+    position: relative;
+  }
+
+  td:before {
+    // Now like a table header
+    // Top/left values mimic padding
+    content: attr(headers);
+    left: Device\baseline(Devices\default($JB\devices))/4;
+    padding-right: 10px;
+    position: absolute;
+    text-align: right;
+    top: Device\baseline(Devices\default($JB\devices))/4;
+    white-space: nowrap;
+    width: 25%; 
+  }
+
+  @include JB\respondTo(Devices\find($JB\devices, name, "tablet")) {
+    display: table;
+    width: 100%;
+
+    thead { 
+      display: table-header-group;
+
+      tr {
+        left: none;
+        position: static;
+        text-align: left;
+        top: none;
+      }
+    }
+
+    tbody {
+      display: table-row-group;
+    }
+
+    tr {
+      display: table-row;
+    }
+
+    th, 
+    td {
+      display: table-cell;
+      // TODO Fix 32px -> proper baseline of the tablet screen
+      padding: 32px/4;
+    } 
+
+    td {
+
+      &:before {
+        display: none;
+      }
+    }
+  } 
+
+
+  // Fallback: no media query support
+
+  display/*\**/: table\9;
+  width/*\**/: 100% \9;
+
+  thead { 
+    display/*\**/: table-header-group\9;
+
+    tr {
+      left/*\**/: none\9;
+      position/*\**/: static\9;
+      text-align/*\**/: left\9;
+      top/*\**/: none\9;
+    }
+  }
+
+  tbody {
+    display/*\**/: table-row-group\9;
+  }
+
+  tr {
+    display/*\**/: table-row\9;
+  }
+
+  th, 
+  td {
+    display/*\**/: table-cell\9;
+    // TODO
+    padding/*\**/: 32px/4 \9;
+  } 
+
+  td {
+
+    &:before {
+      display/*\**/: none\9;
+    }
+  }
+} 

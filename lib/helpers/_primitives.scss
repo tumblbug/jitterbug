@@ -1,0 +1,95 @@
+// JB\setRect(
+//  (
+//    fill: (image-url|color),
+//    stroke: (*image-url|color),
+//    stroke-width: px,
+//    stroke-option: solid / dotted / dashed,
+//    extrude: rate 0..infinite,
+//    intrude: rate 0..infinite,
+//  )
+// ) {
+//  ...override here...
+// }
+
+@mixin JB\setRectangle($options:()) {
+
+  $options: JB\defaults(( 
+    extrusion: null,
+    fill: null,
+    stroke: null,
+    stroke-width: 1px,
+    stroke-option: solid,
+    radius: null,
+  ), $options); 
+
+  @if map-get($options, fill) {
+    background: {
+      @if JB\isColor(map-get($options, fill)) {
+        color: map-get($options, fill);
+      } @else if JB\isString(map-get($options, fill)) {
+        image: url(map-get($options, fill));
+      }
+    }
+  }
+
+  @if map-get($options, stroke) {
+    border: map-get($options, stroke-width) map-get($options, stroke-option) map-get($options, stroke); 
+  } 
+
+  @if map-get($options, radius) {
+    border-radius: map-get($options, radius);
+  }
+
+  @if map-get($options, extrusion) {
+    @if JB\isNull(map-get($options, stroke)) {
+      @error "'extrusion' needs 'stroke'";
+    } @else {
+      border: {
+        @if (map-get($options, extrusion) > 0) {
+          bottom-width: 1px + (1px * map-get($options, extrusion));
+          top-color: lighten(map-get($options, stroke), 8);
+        } @else {
+          bottom-color: lighten(map-get($options, stroke), 8);
+          top-width: 1px + (-1px * map-get($options, extrusion));
+        }
+      }
+    }
+  }
+
+  display: inline-block;
+  min: {
+    width: 10px;
+    height: 10px;
+  }
+
+  @content;
+}
+
+@mixin JB\setArrow($options: ()) { 
+
+  $options: JB\defaults(( 
+    fill: null,
+    width: null,
+    angle: null
+  ), $options); 
+
+  @if map-get($options, angle) {
+    @include JB\transform(rotate(#{map-get($options, angle)}deg));
+  }
+
+  @if JB\isNull(map-get($options, fill)) {
+    @error "Option 'fill' is null";
+  } @else if JB\isNull(map-get($options, width)) {
+    @error "Option 'width' is null";
+  } @else {
+    border-left: map-get($options, width)/2 solid transparent;
+    border-right: map-get($options, width)/2 solid transparent;
+    border-top: map-get($options, width)/2 solid map-get($options, fill);
+    @include JB\transformOrigin(50% map-get($options, width)/4 0);
+  }
+
+  content: '';
+  height: 0;
+  width: 0;
+  display: inline-block;
+}

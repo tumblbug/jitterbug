@@ -1,0 +1,33 @@
+{
+  "name": "jitterbug",
+  "homepage": "https://github.com/jsng/jitterbug",
+  "authors": [
+    "Yum Jaeseung <ym.jsng@gmail.com>"
+  ],
+  "description": "Jitterbug is a package that includes essential grid/typography/media css helpers",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "demo",
+    "spec"
+  ],
+  "dependencies": {
+    "BEM-scss": "https://github.com/jsng/bem-scss.git"
+  },
+  "devDependencies": {
+    "bootcamp": "~1.1.7"
+  },
+  "_release": "05913e90f8",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "05913e90f829b4f38aa94684afd0d5a8698885ce"
+  },
+  "_source": "https://github.com/jsng/jitterbug.git",
+  "_target": "*",
+  "_originalSource": "https://github.com/jsng/jitterbug.git"
+}
