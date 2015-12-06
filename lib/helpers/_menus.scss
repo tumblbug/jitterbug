@@ -17,6 +17,50 @@
 //  ) 
 //))
 
+@mixin JB\UI\tab($options:()) {
+
+  $options: JB\defaults(( 
+    
+    elements: (
+      title: (
+        name: "title"
+      ),
+      item: (
+        name: "item"
+      ) 
+    ),
+
+    modifiers: (
+      horiz: (
+        name: "horiz"
+      )
+    ), 
+
+    nested-indent: 15px
+
+  ), $options); 
+
+  display: inline-block;
+  padding-left: 0; 
+
+  @include ALL(
+    DELEM(map-deep-get($options, elements, "item", name)),
+    DELEM(map-deep-get($options, elements, "title", name))
+  ) {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  @include DELEM(map-deep-get($options, elements, "item", name)) {
+    display: block; // Stack each items
+    list-style-type: none; 
+  } 
+
+  @include DELEM(map-deep-get($options, elements, "title", name)) {
+    @include JB\setGutter((), (0 0 .5)); 
+  } 
+}
+
 @mixin JB\UI\menu($options:()) {
 
   $options: JB\defaults(( 
