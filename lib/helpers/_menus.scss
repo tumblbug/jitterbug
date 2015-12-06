@@ -28,14 +28,7 @@
       item: (
         name: "item"
       ) 
-    ),
-
-    modifiers: (
-      horiz: (
-        name: "horiz"
-      )
     ), 
-
     nested-indent: 15px
 
   ), $options); 
@@ -53,6 +46,51 @@
 
   @include DELEM(map-deep-get($options, elements, "item", name)) {
     display: block; // Stack each items
+    list-style-type: none; 
+  } 
+
+  @include DELEM(map-deep-get($options, elements, "title", name)) {
+    @include JB\setGutter((), (0 0 .5)); 
+  } 
+}
+
+@mixin JB\UI\tabHoriz($options:()) {
+
+  $options: JB\defaults(( 
+    
+    elements: (
+      title: (
+        name: "title"
+      ),
+      item: (
+        name: "item"
+      ) 
+    ), 
+    nested-indent: 15px
+
+  ), $options); 
+
+  display: table;
+  height: 100%;
+  min-height: 100%;
+  padding-left: 0; 
+  vertical-align: middle; 
+
+  @include ALL(
+    DELEM(map-deep-get($options, elements, "item", name)),
+    DELEM(map-deep-get($options, elements, "title", name))
+  ) {
+    @include JB\setGutter((type: "padding"), (0 .6)); 
+    color: inherit;
+    display: table-cell;
+    height: 100%;
+    min-height: 100%;
+    text-decoration: none;
+    vertical-align: middle;
+    white-space: nowrap; // Keep item width to it's content 
+  }
+
+  @include DELEM(map-deep-get($options, elements, "item", name)) {
     list-style-type: none; 
   } 
 
